@@ -9,7 +9,8 @@ import LmoUrlService     from '@/shared/services/lmo_url_service'
 import InstallSlackModalMixin from '@/mixins/install_slack_modal'
 import GroupModalMixin from '@/mixins/group_modal'
 import { subscribeTo }   from '@/shared/helpers/cable'
-import {compact, head, includes, filter} from 'lodash'
+import {compact, head, includes, filter, startCase} from 'lodash'
+import openModal from '@/shared/helpers/open_modal'
 
 export default
   mixins: [InstallSlackModalMixin, GroupModalMixin]
@@ -46,6 +47,24 @@ export default
       else
         ''
 
+    groupPlan: ->
+      plan = ''
+      if @group.subscriptionState == 'canceled'
+        plan = "canceled"
+      else if includes(['pp-pro-monthly'], ['pp-pro-annual'], @group.subscriptionPlan)
+        plan = "pro"
+      else if includes(['pp-community-annual'], @group.subscriptionPlan)
+        plan = "community"
+      else if includes(['pp-basic-monthly', 'pp-basic-annual'], @group.subscriptionPlan)
+        plan = "basic"
+      else
+        plan = @group.subscriptionPlan
+      startCase(plan)
+
+    isPaidPlan: ->
+      !includes(['trial', 'was-gift', 'free'], @group.subscriptionPlan)
+
+
   methods:
     init: ->
       Records.samlProviders.authenticateForGroup(@$route.params.key)
@@ -60,6 +79,12 @@ export default
 
     titleVisible: (visible) ->
       EventBus.$emit('content-title-visible', visible)
+
+    openSubscriptionCardModal: ->
+      openModal
+        component: 'GroupSubscriptionCard'
+        props:
+          group: @group
 
 </script>
 
@@ -76,6 +101,7 @@ v-content
         space
       span.group-page__name.mr-4
         | {{group.name}}
+      v-chip(v-if="isPaidPlan" outlined color="primary" @click="openSubscriptionCardModal") {{groupPlan}}
     trial-banner(:group="group")
     group-onboarding-card(v-if="group" :group="group")
     formatted-text.group-page__description(v-if="group" :model="group" column="description")
