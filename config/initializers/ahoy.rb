@@ -4,6 +4,7 @@ Ahoy.api = true
 Ahoy.server_side_visits = :when_needed
 Ahoy.api_only = true
 Ahoy.mask_ips = true
+# GK: look here https://github.com/ankane/ahoy/blob/8670d8c1465b5702286e1078b8f71dae112cd547/lib/ahoy/base_store.rb
 
 AhoyEmail.api = true
 AhoyEmail.default_options[:open] = true
@@ -15,6 +16,7 @@ class Ahoy::Store < Ahoy::DatabaseStore
     data[:id] = ensure_uuid(data.delete(:visit_token))
     data[:visitor_id] = ensure_uuid(data.delete(:visitor_token))
     data[:gclid] = request.parameters[:gclid]
+    # https://github.com/ankane/ahoy/issues/417
     super(data)
   end
 

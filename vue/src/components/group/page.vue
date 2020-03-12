@@ -10,6 +10,7 @@ import InstallSlackModalMixin from '@/mixins/install_slack_modal'
 import GroupModalMixin from '@/mixins/group_modal'
 import { subscribeTo }   from '@/shared/helpers/cable'
 import {compact, head, includes, filter} from 'lodash'
+import ahoy from "ahoy.js"
 
 export default
   mixins: [InstallSlackModalMixin, GroupModalMixin]
@@ -21,6 +22,10 @@ export default
   created: ->
     @init()
     EventBus.$on 'signedIn', => @init()
+    ahoy.configure({
+      withCredentials: true,
+      })
+    ahoy.track('test')
 
   watch:
     '$route.params.key': 'init'
