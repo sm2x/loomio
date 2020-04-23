@@ -10,7 +10,6 @@ export default class UserModel extends BaseModel
     @hasMany 'notifications'
     @hasMany 'contacts'
     @hasMany 'versions'
-    @hasMany 'identities'
     @hasMany 'reactions'
 
   defaultValues: ->
@@ -71,15 +70,6 @@ export default class UserModel extends BaseModel
     _.uniq _.map @orphanSubgroups(), (group) ->
       group.parent()
 
-  # isAuthorOf: (object) ->
-  #   @id == object.authorId if object
-  #
-  # isAdminOf: (group) ->
-  #   return false unless group
-  #   @recordStore.memberships.find(groupId: group.id, userId: @id, admin: true)[0]?
-  #
-  # isMemberOf: (group) -> @membershipFor(group)?
-  #
   membershipFor: (group) ->
     return unless group
     @recordStore.memberships.find(groupId: group.id, userId: @id)[0]
@@ -128,6 +118,3 @@ export default class UserModel extends BaseModel
   titleFor: (model) ->
     return unless model && model.group()
     (model.group().membershipFor(@) || {}).title
-
-  belongsToPayingGroup: ->
-    _.some @groups(), (group) -> group.subscriptionKind == 'paid'
