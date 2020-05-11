@@ -1,10 +1,10 @@
+- recipient_stance = recipient_stance(recipient, poll)
 .poll-mailer__vote
-  - recipient_stance = recipient_stance(recipient, poll)
-  %h3= t(:"poll_mailer.common.your_response") if recipient_stance
-
   - if recipient_stance.cast_at
+    %h3= t(:"poll_mailer.common.your_response")
     = render 'poll_mailer/common/stance', stance: recipient_stance, poll: poll, recipient: recipient
   - else
+    %h3= t(:"poll_mailer.common.please_respond")
     %p= t(:"poll_mailer.common.time_zone", zone: formatted_time_zone(recipient, poll)) if poll.poll_type == 'meeting'
     %table{class: "poll-mailer-#{poll.poll_type}__poll-options"}
       - poll.poll_options.each do |option|
